@@ -6,6 +6,9 @@ from keras import regularizers
 from keras import backend as K
 from keras import metrics
 
+import matplotlib.pyplot as plt
+plt.switch_backend('agg')
+
 import numpy as np
 
 def vae_loss(x, x_decoded_mean):
@@ -53,16 +56,36 @@ def vae_loss(x, x_decoded_mean):
     return K.mean(xent_loss + kl_loss)
 
 vae.compile(optimizer = 'rmsprop', loss=vae_loss)
-
 vae.load_weights('../model/vae_weights.h5')
 
-from keras.datasets import mnist
+# generator
+decoder_input = Input(shape=(2, ))
+_h_decoded = decoder_h(decoder_input)
+_x_decoded_mean = decoder_mean(_h_decoded)
+generator = Model(decoder_input, _x_decoded_mean)
 
-(x_train, _), (x_test, _) = mnist.load_data(path='mnist.npz')
+n = 15
+figure = np.zeros((28 * 15, 28 * 15))
 
-x_train = x_train.astype('float32') / 255.
-x_test = x_test.astype('float32') / 255.
-x_train = x_train.reshape( (len(x_train), np.prod(x_train.shape[1:])) )
-x_test = x_test.reshape( (len(x_test), np.prod(x_test.shape[1:])) )
+grid_x = np.linspace(-15, 15, n)
+grid_y = np.linspace(-15, 15, n)
 
-print(vae.predict(x_test))
+for i, yi in enumerate(grid_x):
+	for j, xi in enumerate(grid_y):
+		z_sample = np.array([[xi, yi]]) * epsilon_std
+		x_decoded = generator.predict(z_sample)
+		digit = x_decoded[0].reshape(28, 28)
+		figure[i * 28: (i+1) * 28,
+			   j * 28: (j+1) * 28] = digit
+
+plt.figure(figsize=(10, 10))
+plt.imshow(figure)
+plt.savefig('../pic/vae.png')
+plt.close()
+
+
+
+
+
+
+

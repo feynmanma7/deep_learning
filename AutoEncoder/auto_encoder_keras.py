@@ -7,6 +7,8 @@ Reference: https://blog.keras.io/building-autoencoders-in-keras.html
 from keras.layers import Input, Dense
 from keras.models import Model
 from keras import regularizers
+
+import matplotlib.pyplot as plt
 import numpy as np
 np.random.seed(20170430)
 
@@ -59,7 +61,6 @@ decoder = Model(inputs = encoded_input,
 encoded_imgs = encoder.predict(x_test)
 decoded_imgs = decoder.predict(encoded_imgs)
 
-import matplotlib.pyplot as plt
 
 plt.switch_backend('agg')
 
