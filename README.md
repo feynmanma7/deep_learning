@@ -1,5 +1,6 @@
-# Deep Thoughts
+Deep Learning
 
-## Traditional Machine Learning Algorithms
-## Deep Learning Algorithms
-## Deep Thoughts
+___
+
+Notes and Thoughs on Reading Papers and Books.
+
