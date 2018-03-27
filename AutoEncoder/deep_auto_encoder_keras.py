@@ -14,14 +14,13 @@ encoding_dim = 32
 
 input_img = Input(shape = (784, ))
 
-encoded = Dense(encoding_dim, activation = "relu")(input_img)
+encoded = Dense(128, activation = "relu")(input_img)
+encoded = Dense(64, activation = "relu")(encoded)
+encoded = Dense(32, activation = "relu")(encoded)
 
-'''
-encoded = Dense(encoding_dim, activation = "relu",
-    activity_regularizer = regularizers.l1(1e-4))(input_img)
-'''    
-
-decoded = Dense(784, activation = "sigmoid")(encoded)
+decoded = Dense(64, activation = "relu")(encoded)
+decoded = Dense(128, activation = "sigmoid")(decoded)
+decoded = Dense(784, activation = "sigmoid")(decoded)
 
 # autoencoder
 autoencoder = Model(inputs = input_img, outputs = decoded)
@@ -40,26 +39,13 @@ x_train = x_train.reshape((len(x_train), np.prod(x_train.shape[1:])))
 x_test = x_test.reshape((len(x_test), np.prod(x_test.shape[1:])))
 
 autoencoder.fit(x_train, x_train,
-                epochs = 2,
+                epochs = 100,
                 batch_size = 256,
                 shuffle = True,
                 validation_data = (x_test, x_test))
 
 
-
-# encoder
-encoder = Model(inputs = input_img, outputs = encoded)
-
-# decoder
-encoded_input = Input(shape = (encoding_dim, ))
-
-decoder_layer = autoencoder.layers[-1]
-
-decoder = Model(inputs = encoded_input, 
-    outputs = decoder_layer(encoded_input))
-
-encoded_imgs = encoder.predict(x_test)
-decoded_imgs = decoder.predict(encoded_imgs)
+decoded_imgs = autoencoder.predict(x_test)
 
 import matplotlib.pyplot as plt
 
@@ -82,5 +68,5 @@ for i in range(n):
     ax.get_yaxis().set_visible(False)
 
 #plt.show()
-plt.savefig('../tmp/ae.png')
+plt.savefig('../tmp/dae.png')
 plt.close()
