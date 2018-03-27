@@ -4,7 +4,7 @@
 Reference: https://blog.keras.io/building-autoencoders-in-keras.html
 """
 
-from keras.layers import Input, Dense
+from keras.layers import Input, Dense, Conv2D, MaxPooling2D, UpSampling2D
 from keras.models import Model
 from keras import regularizers
 import numpy as np
@@ -12,15 +12,25 @@ np.random.seed(20170430)
 
 encoding_dim = 32
 
-input_img = Input(shape = (784, ))
+input_img = Input(shape = (28, 28, 1))
 
-encoded = Dense(128, activation = "relu")(input_img)
-encoded = Dense(64, activation = "relu")(encoded)
-encoded = Dense(32, activation = "relu")(encoded)
+x = Conv2D(16, (3, 3), activation='relu', padding='same')(input_img)
+x = MaxPooling2D((2, 2), padding='same')(x)
+x = Conv2D(8, (3, 3), activation='relu', padding='same')(x)
+x = MaxPooling2D((2, 2), padding='same')(x)
+x = Conv2D(8, (3, 3), activation='relu', padding='same')(x)
+encoded = MaxPooling2D((2, 2), padding='same')(x)
 
-decoded = Dense(64, activation = "relu")(encoded)
-decoded = Dense(128, activation = "relu")(decoded)
-decoded = Dense(784, activation = "sigmoid")(decoded)
+# point is (4, 4, 8), dim = 128 
+
+x = Conv2D(8, (3, 3), activation='relu', padding='same')(encoded)
+x = UpSampling2D((2, 2))(x)
+x = Conv2D(8, (3, 3), activation='relu', padding='same')(x)
+x = UpSampling2D((2, 2))(x)
+x = Conv2D(8, (3, 3), activation='relu')(x)
+x = UpSampling2D((2, 2))(x)
+
+decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(x)
 
 # autoencoder
 autoencoder = Model(inputs = input_img, outputs = decoded)
@@ -35,8 +45,8 @@ from keras.datasets import mnist
 
 x_train = x_train.astype('float32') / 255.
 x_test = x_test.astype('float32') / 255.
-x_train = x_train.reshape((len(x_train), np.prod(x_train.shape[1:])))
-x_test = x_test.reshape((len(x_test), np.prod(x_test.shape[1:])))
+x_train = np.reshape(x_train, (len(x_train), 28, 28, 1))
+x_test = np.reshape(x_test, (len(x_test), 28, 28, 1))
 
 autoencoder.fit(x_train, x_train,
                 epochs = 100,
@@ -68,5 +78,5 @@ for i in range(n):
     ax.get_yaxis().set_visible(False)
 
 #plt.show()
-plt.savefig('../tmp/dae.png')
+plt.savefig('../tmp/cae.png')
 plt.close()
