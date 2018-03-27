@@ -77,6 +77,5 @@ for i in range(n):
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
 
-plt.title('Conv AE')
 plt.savefig('../tmp/cae.png')
 plt.close()

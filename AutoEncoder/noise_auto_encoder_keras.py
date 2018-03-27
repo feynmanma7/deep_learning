@@ -85,6 +85,5 @@ for i in range(n):
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
 
-plt.title('Noisy AE')
 plt.savefig('../tmp/nae.png')
 plt.close()

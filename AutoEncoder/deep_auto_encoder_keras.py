@@ -67,6 +67,5 @@ for i in range(n):
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
 
-plt.title('DAE')
 plt.savefig('../tmp/dae.png')
 plt.close()

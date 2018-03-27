@@ -45,8 +45,6 @@ autoencoder.fit(x_train, x_train,
                 shuffle = True,
                 validation_data = (x_test, x_test))
 
-
-
 # encoder
 encoder = Model(inputs = input_img, outputs = encoded)
 
