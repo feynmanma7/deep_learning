@@ -1,4 +1,5 @@
-/.ipynb_checkpoints
+*.ipynb_checkpoints/
 /logs
 /model
 /tmp
+*__pycache__/
