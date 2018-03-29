@@ -14,7 +14,7 @@ def sampling(args):
 	        mean=0, 
 	        stddev=1.0)
 
-	    return z_mean + K.exp(z_log_var / 2) * epsilon
+	    return z_mean + K.exp(z_log_var) * epsilon
 
 def create_vcae_model():
 	# variational convolutional auto-encoder
@@ -30,17 +30,27 @@ def create_vcae_model():
 	original_dim = 784
 	x = Input(shape=(28, 28, 1))
 
+	filters = 64
+
 	# Encode
-	e1 = Conv2D(16, (3, 3), activation='relu', padding='same')(x)
-	e2 = MaxPooling2D((2, 2), padding='same')(e1)
-	e3 = Conv2D(8, (3, 3), activation='relu', padding='same')(e2)
-	e4 = MaxPooling2D((2, 2), padding='same')(e3)
-	e5 = Conv2D(8, (3, 3), activation='relu', padding='same')(e4)
-	e6 = MaxPooling2D((2, 2), padding='same')(e5)
+	e1 = Conv2D(1, 
+		kernel_size=(2, 2),
+		padding='same', activation='relu')(x)
+	e2 = Conv2D(filters, 
+		kernel_size=(2, 2), 
+		padding='same', activation='relu',
+		strides=(2,2))(e1)
+	e3 = Conv2D(filters,
+		kernel_size=3, 
+		padding='same', activation='relu',
+		strides=1)(e2)
+	e4 = Conv2D(filters,
+		kernel_size=3,
+		padding='same', activation='relu',
+		strides=1)(e3)
 
-	## (4, 4, 8), 128
+	flat = Flatten()(e4)
 
-	flat = Flatten()(e6)
 	h = Dense(128, activation='relu')(flat)
 	
 	# Sampling	
@@ -51,31 +61,64 @@ def create_vcae_model():
 
 	# Decode
 	d1 = Dense(128, activation='relu')(z)
-	d2 = Dense(16 * 14 * 14, activation='relu')(d1) # upsampling
-	d3 = Reshape((14, 14, 16))(d2) # channels_first? 
-	d4 = Conv2DTranspose(16, (3, 3), activation='relu', padding='same')(d3)
-	d5 = Conv2DTranspose(16, (3, 3), activation='relu', padding='same')(d4)
-	d6 = Conv2DTranspose(16, (3, 3), activation='relu', strides=(2, 2), padding='valid')(d5) #upsampling
-	x_decoded_mean_squash = Conv2D(1, (2, 2), activation='sigmoid', padding='valid')(d6)
+	d2 = Dense(filters * 14 * 14, activation='relu')(d1) # upsampling
+	d3 = Reshape((14, 14, filters))(d2) 
+	d4 = Conv2DTranspose(filters, 
+		kernel_size=3,
+		padding='same',
+		strides=1,
+		activation='relu')(d3)
+	d5 = Conv2DTranspose(filters,
+	 	kernel_size=3,
+	 	padding='same',
+	 	strides=1, 
+	 	activation='relu')(d4)
+	d6 = Conv2DTranspose(filters,
+	 	kernel_size=(3, 3),
+	 	padding='valid',
+	 	strides=(2, 2),
+	 	activation='relu')(d5) #upsampling
+
+	x_output = Conv2D(1,
+		kernel_size=2,
+		padding='valid',
+		activation='sigmoid')(d6)
 
 	# Generator, can name each decoder layer and reuse the name here.
 	decoder_input = Input(shape=(2, ))
+	 
 	g1 = Dense(128, activation='relu')(decoder_input)
-	g2 = Dense(16 * 14 * 14, activation='relu')(g1) # upsampling
-	g3 = Reshape((14, 14, 16))(g2) # channels_first? 
-	g4 = Conv2DTranspose(16, (3, 3), activation='relu', padding='same')(g3)
-	g5 = Conv2DTranspose(16, (3, 3), activation='relu', padding='same')(g4)
-	g6 = Conv2DTranspose(16, (3, 3), activation='relu', strides=(2, 2), padding='valid')(g5)
+	g2 = Dense(filters * 14 * 14, activation='relu')(g1) # upsampling
+	g3 = Reshape((14, 14, filters))(g2) 
+	g4 = Conv2DTranspose(filters, 
+		kernel_size=3,
+		padding='same',
+		strides=1,
+		activation='relu')(g3)
+	g5 = Conv2DTranspose(filters,
+	 	kernel_size=3,
+	 	padding='same',
+	 	strides=1, 
+	 	activation='relu')(g4)
+	g6 = Conv2DTranspose(filters,
+	 	kernel_size=(3, 3),
+	 	padding='valid',
+	 	strides=(2, 2),
+	 	activation='relu')(g5) #upsampling
 
-	decoder_output = Conv2D(1, (2, 2), activation='sigmoid', padding='valid')(g6) 
+	decoder_output = Conv2D(1,
+		kernel_size=2,
+		padding='valid',
+		activation='sigmoid')(g6)
 
 	vcae_generator = Model(decoder_input, decoder_output)
 
 	# Model
-	vcae = Model(inputs=x, outputs=x_decoded_mean_squash)
+	vcae = Model(inputs=x, outputs=x_output)
 	vcae.compile(optimizer='rmsprop', loss=vcae_loss)
 
 	return vcae, vcae_generator
+
 
 def create_vae_model():
 	# variational auto-encoder
