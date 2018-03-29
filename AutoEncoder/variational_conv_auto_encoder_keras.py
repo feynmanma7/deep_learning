@@ -23,7 +23,7 @@ x_test = x_test.reshape( (len(x_test), 28, 28, 1) )
 
 vcae.fit(x_train, x_train,
     shuffle=True, 
-    epochs=100,
+    epochs=1,
     batch_size=128,
     validation_data=(x_test, x_test))
 
