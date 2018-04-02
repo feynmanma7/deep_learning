@@ -1,5 +1,6 @@
 #encoding:utf-8
 from keras.models import load_model
+from scipy.stats import norm
 import numpy as np
 
 import matplotlib.pyplot as plt
@@ -43,6 +44,9 @@ def vcae_test():
 
 	grid_x = np.linspace(-15, 15, n)
 	grid_y = np.linspace(-15, 15, n)
+
+	grid_x = norm.ppf(np.linspace(0.05, 0.95, n))
+	grid_y = norm.ppf(np.linspace(0.05, 0.95, n))
 
 	epsilon_std = 1.0
 	for i, yi in enumerate(grid_x):
