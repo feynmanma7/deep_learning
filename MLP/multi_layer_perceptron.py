@@ -68,8 +68,8 @@ class MLP:
     def summary(self):
         for i in range(self.n_hidden_layer + 1):
             layer = self.network[i]
-            print('Layer-%s weights: %s\n, bias: %s\n, delta:%s\n, input:%s\n, output:%s\n'
-                  % (i, layer['weights'], layer['bias'], layer['delta'], layer['input'], layer['output']))
+            print('Layer-%s weights: %s\n, bias: %s\n, delta:%s\n, output:%s\n'
+                  % (i, layer['weights'], layer['bias'], layer['delta'], layer['output']))
 
 
     def fit(self, X, y):
@@ -139,7 +139,6 @@ class MLP:
             layer_input = self._get_weighted_sum(pre_layer_output, layer_weights, layer_bias)
             layer_output = self._activate(layer_input)
 
-            self.network[l]['input'] = layer_input
             self.network[l]['output'] = layer_output
             pre_layer_output = layer_output
 
