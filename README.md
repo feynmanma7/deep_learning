@@ -1,6 +1,20 @@
 Deep Learning
+----
 
-___
+# MLP
 
-Notes and Thoughs on Reading Papers and Books.
+# CNN
+
+# RNN
+
+# RBM
+
+# AutoEncoder
+
+# DSSM
+
+# GAN
+
+
+
 
