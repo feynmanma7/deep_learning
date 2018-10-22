@@ -94,7 +94,7 @@ def get_VGGNet13_model():
 		activation='relu', 
 		kernel_initializer='uniform'))
 
-	# Pool-5, output: 512 * 14 * 14
+	# Pool-5, output: 512 * 7 * 7
 	model.add(MaxPooling2D(pool_size=(2, 2)))
 
 	model.add(Flatten())
