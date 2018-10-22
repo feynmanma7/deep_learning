@@ -1,6 +1,6 @@
 #encoding:utf-8
 
-from keras.model import Sequential
+from keras.model import Model
 from keras.layers import Dense, Flatten, Dropout, 
 	BatchNormalization, concatenet, Input
 from keras.convolution import Conv2D, MaxPooling2D, 
